@@ -13,5 +13,6 @@
         "**/Library": true,
         "**/ProjectSettings": true,
         "**/Temp": true
-    }
+    },
+    "git.ignoreLimitWarning": true
 }
