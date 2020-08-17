@@ -2,21 +2,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    public float levelStartDelay = 2.0f;
+    public float turnDelay = 0.1f;
+    public int playerFoodPoints = 100;
+
     public static GameManager instance = null;
-    [HideInInspector]
-    public BoardManager boardManager;
 
-
-    public int playerFoodPoints = 0;
-
-    [HideInInspector]
     public bool playersTurn = true;
+    [SerializeField]
+    private bool enemiesMoving;
 
     [SerializeField]
-    private int level = 3;
+    private int level = 1;
+    private BoardManager boardManager;
+    private List<Enemy> enemies;
 
     void Awake()
     {
@@ -27,13 +30,58 @@ public class GameManager : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
 
+        enemies = new List<Enemy>();
+
         boardManager = GetComponent<BoardManager>();
+
+        SceneManager.sceneLoaded += OnSceneWasLoaded;
+    }
+
+    void OnSceneWasLoaded(Scene scene, LoadSceneMode mode)
+    {
+        level++;
         InitGame();
     }
 
     void InitGame()
     {
+        enemies.Clear();
+
         boardManager.SetupScene(level);
+    }
+
+    void Update()
+    {
+        if (playersTurn || enemiesMoving)
+            return;
+
+        StartCoroutine(MoveEnemies());
+    }
+
+    IEnumerator MoveEnemies()
+    {
+        enemiesMoving = true;
+
+        yield return new WaitForSeconds(turnDelay);
+
+        if (enemies.Count == 0)
+            yield return new WaitForSeconds(turnDelay);
+
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            enemies[i].MoveEnemy();
+
+            yield return new WaitForSeconds(enemies[i].moveTime);
+        }
+
+        playersTurn = true;
+
+        enemiesMoving = false;
+    }
+
+    public void AddEnemyToList(Enemy script)
+    {
+        enemies.Add(script);
     }
 
     public void GameOver()
