@@ -24,6 +24,7 @@ public class BoardManager : MonoBehaviour
     public int rows = 8;
     public Count wallCount = new Count(5, 9);
     public Count foodCount = new Count(1, 5);
+    public GameObject player;
     public GameObject exit;
     public GameObject[] floorTiles;
     public GameObject[] wallTiles;
@@ -96,7 +97,7 @@ public class BoardManager : MonoBehaviour
         LayoutObjectAtRandom(wallTiles, wallCount.minimum, wallCount.maximum);
         LayoutObjectAtRandom(foodTiles, foodCount.minimum, foodCount.maximum);
 
-        int enemyCount = (int)Mathf.Log (level, 2.0f);
+        int enemyCount = (int)Mathf.Log(level, 2.0f);
         // Level n = 2^n | n ~= 1
         // Level 1 = 0
         // Level 2 = 0
