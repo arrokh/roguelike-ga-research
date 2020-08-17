@@ -9,6 +9,12 @@ public class GameManager : MonoBehaviour
     [HideInInspector]
     public BoardManager boardManager;
 
+
+    public int playerFoodPoints = 0;
+
+    [HideInInspector]
+    public bool playersTurn = true;
+
     [SerializeField]
     private int level = 3;
 
@@ -30,8 +36,8 @@ public class GameManager : MonoBehaviour
         boardManager.SetupScene(level);
     }
 
-    void Update()
+    public void GameOver()
     {
-
+        enabled = false;
     }
 }

@@ -106,6 +106,7 @@ public class BoardManager : MonoBehaviour
         LayoutObjectAtRandom(enemyTiles, enemyCount, enemyCount);
 
         Instantiate(exit, new Vector3(columns - 1, rows - 1, 0.0f), Quaternion.identity);
+        Instantiate(player, Vector3.zero, Quaternion.identity);
     }
 
 }

@@ -12,10 +12,4 @@ public class Loader : MonoBehaviour
         if (GameManager.instance == null)
             Instantiate(gameManager);
     }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-            SceneManager.LoadScene(0);
-    }
 }
