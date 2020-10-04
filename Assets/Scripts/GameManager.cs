@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour
 
     public static GameManager instance = null;
 
+    public bool useAsGA = false;
+
     public bool playersTurn = true;
     [SerializeField]
     private bool enemiesMoving;
@@ -47,7 +49,8 @@ public class GameManager : MonoBehaviour
     {
         enemies.Clear();
 
-        boardManager.SetupScene(level);
+        if (!useAsGA)
+            boardManager.SetupScene(level);
     }
 
     void Update()
