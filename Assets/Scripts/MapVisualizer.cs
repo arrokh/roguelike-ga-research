@@ -53,9 +53,10 @@ namespace SVS.ChessMaze
                 for (int row = 0; row < grid.Length; row++)
                 {
                     var cell = grid.GetCell(col, row);
-                    var position = new Vector3(cell.X, 0, cell.Z);
+                    // var position = new Vector3(cell.X, 0, cell.Z);
+                    var position = new Vector3(cell.X, cell.Z, 0);
 
-                    var index = grid.CalculateIndexFromCoordinates(position.x, position.z);
+                    var index = grid.CalculateIndexFromCoordinates(position.x, position.y);
                     if (data.obstacleArray[index] && cell.IsTaken == false)
                     {
                         cell.ObjectType = CellObjectType.Obstacle;
@@ -65,7 +66,8 @@ namespace SVS.ChessMaze
                     switch (cell.ObjectType)
                     {
                         case CellObjectType.Empty:
-                            CreateIndicator(position, tileEmpty);
+                            CreateIndicator(position, tileEmpty, Quaternion.Euler(0, 0, 0));
+                            // CreateIndicator(position, tileEmpty);
                             break;
                         case CellObjectType.Road:
                             if (data.path.Count > 0)
@@ -73,75 +75,77 @@ namespace SVS.ChessMaze
                                 previousDirection = GetDirectionOfPreviousCell(position, data);
                                 nextDirection = GetDicrectionOfNextCell(position, data);
                             }
-                            if (previousDirection == Direction.Up && nextDirection == Direction.Right || previousDirection == Direction.Right && nextDirection == Direction.Up)
-                            {
-                                CreateIndicator(position, roadTileCorner, Quaternion.Euler(0, 90, 0));
-                            }
-                            else if (previousDirection == Direction.Right && nextDirection == Direction.Down || previousDirection == Direction.Down && nextDirection == Direction.Right)
-                            {
-                                CreateIndicator(position, roadTileCorner, Quaternion.Euler(0, 180, 0));
-                            }
-                            else if (previousDirection == Direction.Down && nextDirection == Direction.Left || previousDirection == Direction.Left && nextDirection == Direction.Down)
-                            {
-                                CreateIndicator(position, roadTileCorner, Quaternion.Euler(0, -90, 0));
-                            }
-                            else if (previousDirection == Direction.Left && nextDirection == Direction.Up || previousDirection == Direction.Up && nextDirection == Direction.Left)
-                            {
-                                CreateIndicator(position, roadTileCorner);
-                            }
-                            else if (previousDirection == Direction.Right && nextDirection == Direction.Left || previousDirection == Direction.Left && nextDirection == Direction.Right)
-                            {
-                                CreateIndicator(position, roadStraight, Quaternion.Euler(0, 90, 0));
-                            }
-                            else
-                            {
-                                CreateIndicator(position, roadStraight);
-                            }
-
+                            // if (previousDirection == Direction.Up && nextDirection == Direction.Right || previousDirection == Direction.Right && nextDirection == Direction.Up)
+                            // {
+                            //     CreateIndicator(position, roadTileCorner, Quaternion.Euler(0, 90, 0));
+                            // }
+                            // else if (previousDirection == Direction.Right && nextDirection == Direction.Down || previousDirection == Direction.Down && nextDirection == Direction.Right)
+                            // {
+                            //     CreateIndicator(position, roadTileCorner, Quaternion.Euler(0, 180, 0));
+                            // }
+                            // else if (previousDirection == Direction.Down && nextDirection == Direction.Left || previousDirection == Direction.Left && nextDirection == Direction.Down)
+                            // {
+                            //     CreateIndicator(position, roadTileCorner, Quaternion.Euler(0, -90, 0));
+                            // }
+                            // else if (previousDirection == Direction.Left && nextDirection == Direction.Up || previousDirection == Direction.Up && nextDirection == Direction.Left)
+                            // {
+                            //     CreateIndicator(position, roadTileCorner);
+                            // }
+                            // else if (previousDirection == Direction.Right && nextDirection == Direction.Left || previousDirection == Direction.Left && nextDirection == Direction.Right)
+                            // {
+                            //     CreateIndicator(position, roadStraight, Quaternion.Euler(0, 90, 0));
+                            // }
+                            // else
+                            // {
+                            //     CreateIndicator(position, roadStraight);
+                            // }
+                            CreateIndicator(position, roadStraight, Quaternion.Euler(0, 0, 0));
                             break;
                         case CellObjectType.Obstacle:
                             int randomIndex = Random.Range(0, environmentTiles.Length);
-                            CreateIndicator(position, environmentTiles[randomIndex]);
+                            CreateIndicator(position, environmentTiles[randomIndex], Quaternion.Euler(0, 0, 0));
                             break;
                         case CellObjectType.Start:
                             if (data.path.Count > 0)
                             {
                                 nextDirection = GetDirectionFromVectors(data.path[0], position);
-
                             }
-                            if (nextDirection == Direction.Right || nextDirection == Direction.Left)
-                            { 
-                                CreateIndicator(position, startTile, Quaternion.Euler(0, 90, 0));
-                            }
-                            else
-                            {
-                                CreateIndicator(position, startTile);
-                            }
-
+                            // if (nextDirection == Direction.Right || nextDirection == Direction.Left)
+                            // {
+                            //     CreateIndicator(position, startTile, Quaternion.Euler(0, 0, 0));
+                            //     // CreateIndicator(position, startTile, Quaternion.Euler(0, 90, 0));
+                            // }
+                            // else
+                            // {
+                            //     CreateIndicator(position, startTile, Quaternion.Euler(0, 0, 0));
+                            //     // CreateIndicator(position, startTile);
+                            // }
+                            CreateIndicator(position, startTile, Quaternion.Euler(0, 0, 0));
                             break;
                         case CellObjectType.Exit:
                             if (data.path.Count > 0)
                             {
                                 previousDirection = GetDirectionOfPreviousCell(position, data);
-                                
                             }
-                            switch (previousDirection)
-                            {
-                                case Direction.Right:
-                                    CreateIndicator(position, exitTile, Quaternion.Euler(0, 90, 0));
-                                    break;
-                                case Direction.Left:
-                                    CreateIndicator(position, exitTile, Quaternion.Euler(0, -90, 0));
-                                    break;
-                                case Direction.Down:
-                                    CreateIndicator(position, exitTile, Quaternion.Euler(0, 180, 0));
-                                    break;
-                                default:
-                                    CreateIndicator(position, exitTile);
-                                    break;
-                            }
-
-
+                            CreateIndicator(position, exitTile, Quaternion.Euler(0, 0, 0));
+                            // switch (previousDirection)
+                            // {
+                            //     case Direction.Right:
+                            //         // CreateIndicator(position, exitTile, Quaternion.Euler(0, 90, 0));
+                            //         break;
+                            //     case Direction.Left:
+                            //         CreateIndicator(position, exitTile, Quaternion.Euler(0, -90, 0));
+                            //         // CreateIndicator(position, exitTile, Quaternion.Euler(0, -90, 0));
+                            //         break;
+                            //     case Direction.Down:
+                            //         CreateIndicator(position, exitTile, Quaternion.Euler(0, 180, 0));
+                            //         // CreateIndicator(position, exitTile, Quaternion.Euler(0, 180, 0));
+                            //         break;
+                            //     default:
+                            //         CreateIndicator(position, exitTile);
+                            //         // CreateIndicator(position, exitTile);
+                            //         break;
+                            // }
                             break;
                         default:
                             break;
@@ -182,7 +186,7 @@ namespace SVS.ChessMaze
             {
                 return Direction.Left;
             }
-            else if (positionToGoTo.z < position.z)
+            else if (positionToGoTo.z < position.y)
             {
                 return Direction.Down;
             }
