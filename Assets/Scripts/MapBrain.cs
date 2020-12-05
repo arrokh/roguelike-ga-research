@@ -187,6 +187,29 @@ namespace SVS.ChessMaze
             Debug.Log("================ Finish ================");
         }
 
+
+        [Generator]
+        public Tile[,] GenerateGAResult2Danesh()
+        {
+            RunAlgorithm();
+
+            var width = bestMap.Grid.Width;
+            var height = bestMap.Grid.Length;
+
+            Tile[,] map = new Tile[width, height];
+
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    var cell = bestMap.Grid.GetCell(i, j);
+                    map[i, j] = new Tile(cell.X, cell.Z, cell.IsTaken);
+                }
+            }
+
+            return map;
+        }
+
         private void CrossOverParrents(CandidateMap parent1, CandidateMap parent2, out CandidateMap child1, out CandidateMap child2)
         {
             child1 = parent1.DeepClone();

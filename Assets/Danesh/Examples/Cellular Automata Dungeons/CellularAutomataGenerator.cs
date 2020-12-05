@@ -73,8 +73,6 @@ public class CellularAutomataGenerator : MonoBehaviour {
 			map = nextMap;
 		}
 
-		Debug.Log(map[20, 20].x + " | " + map[20, 20].y + " | " + map[20, 20].BLOCKS_MOVEMENT);
-
 		return map;
 	}
 
