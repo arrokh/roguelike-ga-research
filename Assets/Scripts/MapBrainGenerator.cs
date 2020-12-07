@@ -14,15 +14,15 @@ using Random = UnityEngine.Random;
 public class MapBrainGenerator : MonoBehaviour
 {
     //Genetic algorithm parameters
-    [SerializeField, Range(20, 100)]
-    public int populationSize = 20;
+    [SerializeField, Range(10, 1000)]
+    public int populationSize = 10;
     [SerializeField, Range(0, 100)]
     public int crossoverRate = 100;
     private double crossoverRatePercent;
     [SerializeField, Range(0, 100)]
     public int mutationRate = 0;
     private double mutationRatePercent;
-    [SerializeField, Range(1, 1000)]
+    [SerializeField, Range(1, 100)]
     public int generatinLimit = 10;
 
     //algorithm variables
