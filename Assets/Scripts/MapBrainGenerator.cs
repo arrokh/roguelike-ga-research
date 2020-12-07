@@ -14,20 +14,16 @@ using Random = UnityEngine.Random;
 public class MapBrainGenerator : MonoBehaviour
 {
     //Genetic algorithm parameters
-    [Tunable(MinValue: 20, MaxValue: 100, Name: "Population Size")]
     [SerializeField, Range(20, 100)]
-    private int populationSize = 20;
-    [Tunable(MinValue: 0, MaxValue: 100, Name: "Crossover Rate")]
+    public int populationSize = 20;
     [SerializeField, Range(0, 100)]
-    private int crossoverRate = 100;
+    public int crossoverRate = 100;
     private double crossoverRatePercent;
-    [Tunable(MinValue: 0, MaxValue: 100, Name: "Mutation Rate")]
     [SerializeField, Range(0, 100)]
-    private int mutationRate = 0;
+    public int mutationRate = 0;
     private double mutationRatePercent;
-    [Tunable(MinValue: 1, MaxValue: 100, Name: "Generation Limit")]
-    [SerializeField, Range(1, 100)]
-    private int generatinLimit = 10;
+    [SerializeField, Range(1, 1000)]
+    public int generatinLimit = 10;
 
     //algorithm variables
     private List<CandidateMap> currentGeneration;
@@ -195,12 +191,15 @@ public class MapBrainGenerator : MonoBehaviour
 
 
     [Generator]
-    public object GenerateGAResult2Danesh()
+    public Tile[,] GenerateGAResult2Danesh()
     {
-        RunAlgorithm();
+        //RunAlgorithm();
 
         var width = bestMap.Grid.Width;
         var height = bestMap.Grid.Length;
+
+        Debug.Log("width : " + width);
+        Debug.Log("height : " + height);
 
         Tile[,] map = new Tile[width, height];
 
@@ -216,35 +215,43 @@ public class MapBrainGenerator : MonoBehaviour
         return map;
     }
 
+
     [Visualiser]
     public Texture2D RenderMap(object _m)
     {
+        //Cast the object to the type we expect
         Tile[,] map = (Tile[,])_m;
 
-        Texture2D tex = new Texture2D(8 * map.GetLength(0), 8 * map.GetLength(1), TextureFormat.ARGB32, false);
-        int sf = 8; int Width = map.GetLength(0); int Height = map.GetLength(1);
-        Texture2D gnd = Resources.Load<Texture2D>("tiles/tile_17");
+        Debug.Log("map[0, 0].BLOCKS_MOVEMENT : " + map[0, 0].BLOCKS_MOVEMENT);
 
-        for (int i = 0; i < Width; i++)
+        //Create a new texture the right size for our content
+        Texture2D tex = new Texture2D(map.GetLength(0), map.GetLength(1), TextureFormat.ARGB32, false);
+
+        //For each tile in the map...
+        for (int i = 0; i < map.GetLength(0); i++)
         {
-            for (int j = 0; j < Height; j++)
+            for (int j = 0; j < map.GetLength(1); j++)
             {
+                //...if it's a wall tile...
                 if (map[i, j].BLOCKS_MOVEMENT)
                 {
-                    VisUtils.PaintTexture(tex, i, j, sf, gnd, 8, 8);
-                    VisUtils.PaintTexture(tex, i, j, sf, selectTexture(map, i, j), 8, 8);
-
+                    //...paint a black pixel on the screen
+                    VisUtils.PaintPoint(tex, i, j, 1, Color.black);
                 }
                 else
                 {
-                    VisUtils.PaintTexture(tex, i, j, sf, gnd, 8, 8);
+                    //...otherwise, paint a white pixel
+                    VisUtils.PaintPoint(tex, i, j, 1, Color.white);
                 }
             }
         }
 
+        //Remember to apply the results before we return it
         tex.Apply();
+
         return tex;
     }
+
 
     private void CrossOverParrents(CandidateMap parent1, CandidateMap parent2, out CandidateMap child1, out CandidateMap child2)
     {
