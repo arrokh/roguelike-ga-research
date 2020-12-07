@@ -10,6 +10,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using System.IO;
+using System.Text;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 
 public class MapBrainGenerator : MonoBehaviour
 {
@@ -66,7 +73,7 @@ public class MapBrainGenerator : MonoBehaviour
     public bool IsAlgorithmRunning { get => isAlgorithmRunning; }
 
     [SerializeField]
-    private List<MetricsData> MetricsData = new List<MetricsData>();
+    private List<MetricsData> metricsData = new List<MetricsData>();
 
     private void Start()
     {
@@ -78,6 +85,9 @@ public class MapBrainGenerator : MonoBehaviour
     {
         if (Input.GetKeyUp(KeyCode.Space))
             FindObjectOfType<MapBrainGenerator>().RunAlgorithm();
+
+        if (Input.GetKeyUp(KeyCode.KeypadEnter))
+            SaveToFile();
     }
 
     public void RunAlgorithm()
@@ -202,7 +212,7 @@ public class MapBrainGenerator : MonoBehaviour
         Debug.Log("Time needed to run this genetic optimisation: " + elapsedSpan.TotalSeconds);
 
 
-        MetricsData.Add(new global::MetricsData()
+        metricsData.Add(new global::MetricsData()
         {
             index = (indexGenerate - 2),
             bestfitnessScore = bestFitnessScoreAllTime,
@@ -213,69 +223,6 @@ public class MapBrainGenerator : MonoBehaviour
         });
 
         Debug.Log("================ Finish ================");
-    }
-
-
-    [Generator]
-    public Tile[,] GenerateGAResult2Danesh()
-    {
-        //RunAlgorithm();
-
-        var width = bestMap.Grid.Width;
-        var height = bestMap.Grid.Length;
-
-        Debug.Log("width : " + width);
-        Debug.Log("height : " + height);
-
-        Tile[,] map = new Tile[width, height];
-
-        for (int i = 0; i < width; i++)
-        {
-            for (int j = 0; j < height; j++)
-            {
-                var cell = bestMap.Grid.GetCell(i, j);
-                map[i, j] = new Tile(cell.X, cell.Z, cell.IsTaken);
-            }
-        }
-
-        return map;
-    }
-
-
-    [Visualiser]
-    public Texture2D RenderMap(object _m)
-    {
-        //Cast the object to the type we expect
-        Tile[,] map = (Tile[,])_m;
-
-        Debug.Log("map[0, 0].BLOCKS_MOVEMENT : " + map[0, 0].BLOCKS_MOVEMENT);
-
-        //Create a new texture the right size for our content
-        Texture2D tex = new Texture2D(map.GetLength(0), map.GetLength(1), TextureFormat.ARGB32, false);
-
-        //For each tile in the map...
-        for (int i = 0; i < map.GetLength(0); i++)
-        {
-            for (int j = 0; j < map.GetLength(1); j++)
-            {
-                //...if it's a wall tile...
-                if (map[i, j].BLOCKS_MOVEMENT)
-                {
-                    //...paint a black pixel on the screen
-                    VisUtils.PaintPoint(tex, i, j, 1, Color.black);
-                }
-                else
-                {
-                    //...otherwise, paint a white pixel
-                    VisUtils.PaintPoint(tex, i, j, 1, Color.white);
-                }
-            }
-        }
-
-        //Remember to apply the results before we return it
-        tex.Apply();
-
-        return tex;
     }
 
 
@@ -377,6 +324,52 @@ public class MapBrainGenerator : MonoBehaviour
             name += "0";
 
         return Resources.Load<Texture2D>("tiles/tile_" + autotiles[name]);
+    }
+
+    public string ToCSV()
+    {
+        var sb = new StringBuilder("Index,Best Generation Index");
+        foreach (var data in metricsData)
+        {
+            sb.AppendLine();
+            sb.Append(data.index.ToString());
+            sb.Append(",");
+            sb.Append(data.bestGenerationIndex.ToString());
+            //sb.Append('/n').Append(frame.Time.ToString()).Append(',').Append(frame.Value.ToString());
+        }
+
+        return sb.ToString();
+    }
+    public void SaveToFile()
+    {
+        // Use the CSV generation from before
+        var content = ToCSV();
+
+        // The target file path e.g.
+#if UNITY_EDITOR
+        var folder = Application.streamingAssetsPath;
+
+        if (!Directory.Exists(folder))
+            Directory.CreateDirectory(folder);
+#else
+    var folder = Application.persistentDataPath;
+#endif
+
+        var filePath = Path.Combine(folder, "export.csv");
+
+        using (var writer = new StreamWriter(filePath, false))
+        {
+            writer.Write(content);
+        }
+
+        // Or just
+        //File.WriteAllText(content);
+
+        Debug.Log("CSV file success written to");
+
+#if UNITY_EDITOR
+        AssetDatabase.Refresh();
+#endif
     }
 }
 
