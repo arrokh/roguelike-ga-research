@@ -14,14 +14,18 @@ namespace SVS.ChessMaze
     public class MapBrain : MonoBehaviour
     {
         //Genetic algorithm parameters
+        [Tunable(MinValue: 20, MaxValue: 100, Name: "Population Size")]
         [SerializeField, Range(20, 100)]
         private int populationSize = 20;
+        [Tunable(MinValue: 0, MaxValue: 100, Name: "Crossover Rate")]
         [SerializeField, Range(0, 100)]
         private int crossoverRate = 100;
         private double crossoverRatePercent;
+        [Tunable(MinValue: 0, MaxValue: 100, Name: "Mutation Rate")]
         [SerializeField, Range(0, 100)]
         private int mutationRate = 0;
         private double mutationRatePercent;
+        [Tunable(MinValue: 1, MaxValue: 100, Name: "Generation Limit")]
         [SerializeField, Range(1, 100)]
         private int generatinLimit = 10;
 
@@ -189,7 +193,7 @@ namespace SVS.ChessMaze
 
 
         [Generator]
-        public Tile[,] GenerateGAResult2Danesh()
+        public object GenerateGAResult2Danesh()
         {
             RunAlgorithm();
 
@@ -208,6 +212,36 @@ namespace SVS.ChessMaze
             }
 
             return map;
+        }
+
+        [Visualiser]
+        public Texture2D RenderMap(object _m)
+        {
+            Tile[,] map = (Tile[,])_m;
+
+            Texture2D tex = new Texture2D(8 * map.GetLength(0), 8 * map.GetLength(1), TextureFormat.ARGB32, false);
+            int sf = 8; int Width = map.GetLength(0); int Height = map.GetLength(1);
+            Texture2D gnd = Resources.Load<Texture2D>("tiles/tile_17");
+
+            for (int i = 0; i < Width; i++)
+            {
+                for (int j = 0; j < Height; j++)
+                {
+                    if (map[i, j].BLOCKS_MOVEMENT)
+                    {
+                        VisUtils.PaintTexture(tex, i, j, sf, gnd, 8, 8);
+                        VisUtils.PaintTexture(tex, i, j, sf, selectTexture(map, i, j), 8, 8);
+
+                    }
+                    else
+                    {
+                        VisUtils.PaintTexture(tex, i, j, sf, gnd, 8, 8);
+                    }
+                }
+            }
+
+            tex.Apply();
+            return tex;
         }
 
         private void CrossOverParrents(CandidateMap parent1, CandidateMap parent2, out CandidateMap child1, out CandidateMap child2)
@@ -262,6 +296,52 @@ namespace SVS.ChessMaze
             }
             score -= mapData.cornersNearEachOther * fitnessNearCornerWeght;
             return score;
+        }
+
+        Dictionary<string, string> autotiles;
+
+        Texture2D selectTexture(Tile[,] map, int x, int y)
+        {
+            if (autotiles == null)
+            {
+                autotiles = new Dictionary<string, string>();
+                autotiles.Add("0000", "01");
+                autotiles.Add("0001", "09");
+                autotiles.Add("0010", "05");
+                autotiles.Add("0011", "13");
+                autotiles.Add("0100", "03");
+                autotiles.Add("0101", "11");
+                autotiles.Add("0110", "07");
+                autotiles.Add("0111", "15");
+                autotiles.Add("1000", "02");
+                autotiles.Add("1001", "10");
+                autotiles.Add("1010", "06");
+                autotiles.Add("1011", "14");
+                autotiles.Add("1100", "04");
+                autotiles.Add("1101", "12");
+                autotiles.Add("1110", "08");
+                autotiles.Add("1111", "16");
+            }
+
+            string name = "";
+            if (y == map.GetLength(1) - 1 || map[x, y + 1].BLOCKS_MOVEMENT)
+                name += "1";
+            else
+                name += "0";
+            if (x == map.GetLength(0) - 1 || map[x + 1, y].BLOCKS_MOVEMENT)
+                name += "1";
+            else
+                name += "0";
+            if (y == 0 || map[x, y - 1].BLOCKS_MOVEMENT)
+                name += "1";
+            else
+                name += "0";
+            if (x == 0 || map[x - 1, y].BLOCKS_MOVEMENT)
+                name += "1";
+            else
+                name += "0";
+
+            return Resources.Load<Texture2D>("tiles/tile_" + autotiles[name]);
         }
     }
 }

@@ -1,0 +1,7 @@
+ChanceTileWillSpawnAlive:float:0,45
+PhaseOneIterations:int:5
+PhaseTwoIterations:int:5
+MinBirthPhase1:int:5
+MaxR2BirthPhase1:int:0
+MinBirthPhase2:int:5
+MaxR2BirthPhase2:int:0
