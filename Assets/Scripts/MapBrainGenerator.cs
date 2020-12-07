@@ -238,19 +238,20 @@ public class MapBrainGenerator : MonoBehaviour
         //Debug.Log("================ Finish ================");
 
         Debug.Log("=> Progress Run Genetic Algorithm : " + (indexGenerate + 1) + "/" + (totalGeneration));
-
-        if (indexGenerate < totalGeneration - 1)
-            Invoke("RunSS", 0.5f);
-        else
-            SaveToFile();
+        Invoke("RunSS", 0.5f);
     }
 
     public void RunSS()
     {
-        indexGenerate++;
         ScreenCapture.CaptureScreenshot("./Assets/SS/" + FindObjectOfType<MapBrainGenerator>().timestamp + " - " + (FindObjectOfType<MapBrainGenerator>().indexGenerate + 1) + "-Generation.png");
-        Invoke("RunAlgorithm", 0.5f);
 
+        if (indexGenerate < totalGeneration - 1)
+        {
+            indexGenerate++;
+            Invoke("RunAlgorithm", 0.5f);
+        }
+        else
+            SaveToFile();
     }
 
     private void CrossOverParrents(CandidateMap parent1, CandidateMap parent2, out CandidateMap child1, out CandidateMap child2)
