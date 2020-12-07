@@ -93,7 +93,9 @@ public class MapBrainGenerator : MonoBehaviour
         {
             if (Input.GetKeyUp(KeyCode.Space))
             {
+                indexGenerate = 0;
                 timestamp = DateTime.UtcNow.ToString().Replace("/", "");
+                metricsData.Clear();
                 RunAlgorithm();
             }
 
@@ -124,7 +126,6 @@ public class MapBrainGenerator : MonoBehaviour
         bestMap = null;
         bestMapGenerationNumber = 0;
         generationNumber = 0;
-        ++indexGenerate;
     }
 
     private void FindOptimalSolution(MapGrid grid)
@@ -226,7 +227,7 @@ public class MapBrainGenerator : MonoBehaviour
 
         metricsData.Add(new global::MetricsData()
         {
-            index = (indexGenerate - 2),
+            index = (indexGenerate + 1),
             bestfitnessScore = bestFitnessScoreAllTime,
             bestGenerationIndex = bestMapGenerationNumber,
             corner = data.cornersList.Count,
@@ -236,12 +237,20 @@ public class MapBrainGenerator : MonoBehaviour
 
         //Debug.Log("================ Finish ================");
 
-        Debug.Log("=> Progress Run Genetic Algorithm : " + (indexGenerate - 2) + "/" + (totalGeneration - 1));
+        Debug.Log("=> Progress Run Genetic Algorithm : " + (indexGenerate + 1) + "/" + (totalGeneration));
 
-        if (indexGenerate < totalGeneration + 1)
-            Invoke("RunAlgorithm", 0.5f);
+        if (indexGenerate < totalGeneration - 1)
+            Invoke("RunSS", 0.5f);
         else
             SaveToFile();
+    }
+
+    public void RunSS()
+    {
+        indexGenerate++;
+        ScreenCapture.CaptureScreenshot("./Assets/SS/" + FindObjectOfType<MapBrainGenerator>().timestamp + " - " + (FindObjectOfType<MapBrainGenerator>().indexGenerate + 1) + "-Generation.png");
+        Invoke("RunAlgorithm", 0.5f);
+
     }
 
     private void CrossOverParrents(CandidateMap parent1, CandidateMap parent2, out CandidateMap child1, out CandidateMap child2)
