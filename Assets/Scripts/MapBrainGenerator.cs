@@ -236,7 +236,7 @@ public class MapBrainGenerator : MonoBehaviour
 
         //Debug.Log("================ Finish ================");
 
-        Debug.Log("=> index : " + (indexGenerate - 2) + "/" + (totalGeneration - 1));
+        Debug.Log("=> Progress Run Genetic Algorithm : " + (indexGenerate - 2) + "/" + (totalGeneration - 1));
 
         if (indexGenerate < totalGeneration + 1)
             Invoke("RunAlgorithm", 0.5f);
