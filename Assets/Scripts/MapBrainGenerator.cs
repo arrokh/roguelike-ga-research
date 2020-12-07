@@ -329,7 +329,7 @@ public class MapBrainGenerator : MonoBehaviour
             ;
 
         sb.AppendLine("METRICS:")
-            .AppendLine("Index;Best Gen. Index;Best Fitness Score;Path;Corner;Duration");
+            .Append("Index;Best Gen. Index;Best Fitness Score;Path;Corner;Duration");
         foreach (var data in metricsData)
         {
             sb.AppendLine().
