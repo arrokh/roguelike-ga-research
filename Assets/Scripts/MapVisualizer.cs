@@ -38,12 +38,14 @@ namespace SVS.ChessMaze
                 VisualizeUsingPrimitives(grid, data);
             }
 
-            StartCoroutine("RunSS");
+            if (!FindObjectOfType<MapBrainGenerator>().IsAlgorithmRunning)
+                StartCoroutine("RunSS");
         }
         private IEnumerator RunSS()
         {
             yield return new WaitForEndOfFrame();
-            ScreenCapture.CaptureScreenshot("./Assets/SS/" + (FindObjectOfType<MapBrainGenerator>().indexGenerate - 2) + " - Generation.png");
+            if ((FindObjectOfType<MapBrainGenerator>().indexGenerate - 2) > -1)
+                ScreenCapture.CaptureScreenshot("./Assets/SS/" + FindObjectOfType<MapBrainGenerator>().timestamp + "-" + (FindObjectOfType<MapBrainGenerator>().indexGenerate - 2) + " - Generation.png");
         }
 
         private void VisualizeUsingPrefabs(MapGrid grid, MapData data)

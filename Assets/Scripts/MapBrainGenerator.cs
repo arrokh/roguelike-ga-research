@@ -12,6 +12,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 using System.IO;
 using System.Text;
+using RedScarf.EasyCSV;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -20,6 +21,11 @@ using UnityEditor;
 
 public class MapBrainGenerator : MonoBehaviour
 {
+    public string timestamp = "";
+
+    [SerializeField]
+    private int totalGeneration = 10;
+
     [SerializeField]
     private bool showLogEachGeneration = false;
 
@@ -83,11 +89,17 @@ public class MapBrainGenerator : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyUp(KeyCode.Space))
-            FindObjectOfType<MapBrainGenerator>().RunAlgorithm();
+        if (!IsAlgorithmRunning)
+        {
+            if (Input.GetKeyUp(KeyCode.Space))
+            {
+                timestamp = DateTime.UtcNow.ToString().Replace("/", "");
+                RunAlgorithm();
+            }
 
-        if (Input.GetKeyUp(KeyCode.KeypadEnter))
-            SaveToFile();
+            if (Input.GetKeyUp(KeyCode.KeypadEnter))
+                SaveToFile();
+        }
     }
 
     public void RunAlgorithm()
@@ -193,23 +205,23 @@ public class MapBrainGenerator : MonoBehaviour
 
     private void ShowResults()
     {
-        Debug.Log("======== MapBrain::ShowResult() ========");
+        //Debug.Log("======== MapBrain::ShowResult() ========");
 
         isAlgorithmRunning = false;
-        Debug.Log("Best solution at generation [" + ++bestMapGenerationNumber + "] with score: " + bestFitnessScoreAllTime);
+        //Debug.Log("Best solution at generation [" + ++bestMapGenerationNumber + "] with score: " + bestFitnessScoreAllTime);
 
         var data = bestMap.ReturnMapData();
         mapVisualizer.VisualizeMap(bestMap.Grid, data, true);
 
         UiController.instance.HideLoadingScreen();
 
-        Debug.Log("Path length: " + data.path.Count);
-        Debug.Log("Corners count: " + data.cornersList.Count);
+        //Debug.Log("Path length: " + data.path.Count);
+        //Debug.Log("Corners count: " + data.cornersList.Count);
 
         endDate = DateTime.Now;
         long elapsedTicks = endDate.Ticks - startDate.Ticks;
         TimeSpan elapsedSpan = new TimeSpan(elapsedTicks);
-        Debug.Log("Time needed to run this genetic optimisation: " + elapsedSpan.TotalSeconds);
+        //Debug.Log("Time needed to run this genetic optimisation: " + elapsedSpan.TotalSeconds);
 
 
         metricsData.Add(new global::MetricsData()
@@ -222,9 +234,15 @@ public class MapBrainGenerator : MonoBehaviour
             duration = elapsedSpan.TotalSeconds
         });
 
-        Debug.Log("================ Finish ================");
-    }
+        //Debug.Log("================ Finish ================");
 
+        Debug.Log("=> index : " + (indexGenerate - 2) + "/" + (totalGeneration - 1));
+
+        if (indexGenerate < totalGeneration + 1)
+            Invoke("RunAlgorithm", 0.5f);
+        else
+            SaveToFile();
+    }
 
     private void CrossOverParrents(CandidateMap parent1, CandidateMap parent2, out CandidateMap child1, out CandidateMap child2)
     {
@@ -280,62 +298,24 @@ public class MapBrainGenerator : MonoBehaviour
         return score;
     }
 
-    Dictionary<string, string> autotiles;
-
-    Texture2D selectTexture(Tile[,] map, int x, int y)
-    {
-        if (autotiles == null)
-        {
-            autotiles = new Dictionary<string, string>();
-            autotiles.Add("0000", "01");
-            autotiles.Add("0001", "09");
-            autotiles.Add("0010", "05");
-            autotiles.Add("0011", "13");
-            autotiles.Add("0100", "03");
-            autotiles.Add("0101", "11");
-            autotiles.Add("0110", "07");
-            autotiles.Add("0111", "15");
-            autotiles.Add("1000", "02");
-            autotiles.Add("1001", "10");
-            autotiles.Add("1010", "06");
-            autotiles.Add("1011", "14");
-            autotiles.Add("1100", "04");
-            autotiles.Add("1101", "12");
-            autotiles.Add("1110", "08");
-            autotiles.Add("1111", "16");
-        }
-
-        string name = "";
-        if (y == map.GetLength(1) - 1 || map[x, y + 1].BLOCKS_MOVEMENT)
-            name += "1";
-        else
-            name += "0";
-        if (x == map.GetLength(0) - 1 || map[x + 1, y].BLOCKS_MOVEMENT)
-            name += "1";
-        else
-            name += "0";
-        if (y == 0 || map[x, y - 1].BLOCKS_MOVEMENT)
-            name += "1";
-        else
-            name += "0";
-        if (x == 0 || map[x - 1, y].BLOCKS_MOVEMENT)
-            name += "1";
-        else
-            name += "0";
-
-        return Resources.Load<Texture2D>("tiles/tile_" + autotiles[name]);
-    }
-
     public string ToCSV()
     {
-        var sb = new StringBuilder("Index,Best Generation Index");
+        var sb = new StringBuilder("Index;Best Gen. Index;Best Fitness Score;Path;Corner;Duration");
         foreach (var data in metricsData)
         {
-            sb.AppendLine();
-            sb.Append(data.index.ToString());
-            sb.Append(",");
-            sb.Append(data.bestGenerationIndex.ToString());
-            //sb.Append('/n').Append(frame.Time.ToString()).Append(',').Append(frame.Value.ToString());
+            sb.AppendLine().
+                Append(data.index.ToString()).
+                Append(";").
+                Append(data.bestGenerationIndex.ToString()).
+                Append(";").
+                Append(data.bestfitnessScore.ToString()).
+                Append(";").
+                Append(data.path.ToString()).
+                Append(";").
+                Append(data.corner.ToString()).
+                Append(";").
+                Append(data.duration.ToString()).
+                Append(";");
         }
 
         return sb.ToString();
@@ -355,7 +335,7 @@ public class MapBrainGenerator : MonoBehaviour
     var folder = Application.persistentDataPath;
 #endif
 
-        var filePath = Path.Combine(folder, "export.csv");
+        var filePath = Path.Combine(folder, "Export-" + timestamp + ".csv");
 
         using (var writer = new StreamWriter(filePath, false))
         {
