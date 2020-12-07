@@ -3,6 +3,7 @@
 	(https://svstudio.itch.io)
 */
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -36,6 +37,13 @@ namespace SVS.ChessMaze
             {
                 VisualizeUsingPrimitives(grid, data);
             }
+
+            StartCoroutine("RunSS");
+        }
+        private IEnumerator RunSS()
+        {
+            yield return new WaitForEndOfFrame();
+            ScreenCapture.CaptureScreenshot("./Assets/SS/" + (FindObjectOfType<MapBrainGenerator>().indexGenerate - 2) + " - Generation.png");
         }
 
         private void VisualizeUsingPrefabs(MapGrid grid, MapData data)
@@ -99,6 +107,7 @@ namespace SVS.ChessMaze
                     }
                 }
             }
+
         }
 
         private Direction GetDicrectionOfNextCell(Vector3 position, MapData data)

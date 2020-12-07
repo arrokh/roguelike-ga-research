@@ -19,13 +19,4 @@ public class MapBrainMetrics : MonoBehaviour
 
         return 0.2f;
     }
-
-    private void Update()
-    {
-        if (Input.GetKeyUp(KeyCode.Space))
-        {
-            Debug.Log("===> RunAlgorithm()");
-            FindObjectOfType<MapBrainGenerator>().RunAlgorithm();
-        }
-    }
 }

@@ -13,6 +13,11 @@ using Random = UnityEngine.Random;
 
 public class MapBrainGenerator : MonoBehaviour
 {
+    [SerializeField]
+    private bool showLogEachGeneration = false;
+
+    public int indexGenerate = 0;
+
     //Genetic algorithm parameters
     [SerializeField, Range(10, 1000)]
     public int populationSize = 10;
@@ -60,6 +65,8 @@ public class MapBrainGenerator : MonoBehaviour
 
     public bool IsAlgorithmRunning { get => isAlgorithmRunning; }
 
+    [SerializeField]
+    private List<MetricsData> MetricsData = new List<MetricsData>();
 
     private void Start()
     {
@@ -67,6 +74,11 @@ public class MapBrainGenerator : MonoBehaviour
         crossoverRatePercent = crossoverRate / 100D;
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyUp(KeyCode.Space))
+            FindObjectOfType<MapBrainGenerator>().RunAlgorithm();
+    }
 
     public void RunAlgorithm()
     {
@@ -90,6 +102,7 @@ public class MapBrainGenerator : MonoBehaviour
         bestMap = null;
         bestMapGenerationNumber = 0;
         generationNumber = 0;
+        ++indexGenerate;
     }
 
     private void FindOptimalSolution(MapGrid grid)
@@ -136,7 +149,8 @@ public class MapBrainGenerator : MonoBehaviour
         yield return new WaitForEndOfFrame();
         UiController.instance.SetLoadingValue(generationNumber / (float)generatinLimit);
 
-        Debug.Log("Current generation [ " + generationNumber++ + " ] score: " + bestFitnessScoreAllTime);
+        if (showLogEachGeneration)
+            Debug.Log("Current generation [ " + generationNumber++ + " ] score: " + bestFitnessScoreAllTime);
 
         if (generationNumber < generatinLimit)
         {
@@ -186,6 +200,18 @@ public class MapBrainGenerator : MonoBehaviour
         long elapsedTicks = endDate.Ticks - startDate.Ticks;
         TimeSpan elapsedSpan = new TimeSpan(elapsedTicks);
         Debug.Log("Time needed to run this genetic optimisation: " + elapsedSpan.TotalSeconds);
+
+
+        MetricsData.Add(new global::MetricsData()
+        {
+            index = (indexGenerate - 2),
+            bestfitnessScore = bestFitnessScoreAllTime,
+            bestGenerationIndex = bestMapGenerationNumber,
+            corner = data.cornersList.Count,
+            path = data.path.Count,
+            duration = elapsedSpan.TotalSeconds
+        });
+
         Debug.Log("================ Finish ================");
     }
 
@@ -354,3 +380,14 @@ public class MapBrainGenerator : MonoBehaviour
     }
 }
 
+[Serializable]
+public class MetricsData
+{
+    public int index;
+    public float bestGenerationIndex;
+    public float bestfitnessScore;
+    public int path;
+    public int corner;
+    public double duration;
+
+}
