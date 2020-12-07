@@ -310,7 +310,26 @@ public class MapBrainGenerator : MonoBehaviour
 
     public string ToCSV()
     {
-        var sb = new StringBuilder("Index;Best Gen. Index;Best Fitness Score;Path;Corner;Duration");
+        var sb = new StringBuilder("");
+        sb.AppendLine("PARAMETERS:")
+            .AppendLine("populationSize;" + populationSize)
+            .AppendLine("crossoverRate;" + crossoverRate)
+            .AppendLine("mutationRate;" + mutationRate)
+            .AppendLine("generatinLimit;" + generatinLimit)
+            .AppendLine("fitnessCornerMin;" + fitnessCornerMin)
+            .AppendLine("fitnessCornerMax;" + fitnessCornerMax)
+            .AppendLine("fitnessCornerWeight;" + fitnessCornerWeight)
+            .AppendLine("fitnessNearCornerWeght;" + fitnessNearCornerWeght)
+            .AppendLine("fitnessPathWeight;" + fitnessPathWeight)
+            .AppendLine("fitnessObstacleWeight;" + fitnessObstacleWeight)
+            .AppendLine("widthOfMap;" + widthOfMap)
+            .AppendLine("lengthOfMap;" + lengthOfMap)
+            .AppendLine("numberOfKnightPieces;" + numberOfKnightPieces)
+            .AppendLine("\n")
+            ;
+
+        sb.AppendLine("METRICS:")
+            .AppendLine("Index;Best Gen. Index;Best Fitness Score;Path;Corner;Duration");
         foreach (var data in metricsData)
         {
             sb.AppendLine().
@@ -355,7 +374,7 @@ public class MapBrainGenerator : MonoBehaviour
         // Or just
         //File.WriteAllText(content);
 
-        Debug.Log("CSV file success written to");
+        Debug.Log("CSV file success written");
 
 #if UNITY_EDITOR
         AssetDatabase.Refresh();
